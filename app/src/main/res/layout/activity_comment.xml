@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:fitsSystemWindows="true">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+        <TextView
+                android:id="@+id/howManyComments"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="qqqqqqqqqqqqq"
+                android:textSize="26sp"
+                android:textColor="@color/black" />
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#A3A1A1" />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/commentContent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="12"/>
+
+</LinearLayout>
