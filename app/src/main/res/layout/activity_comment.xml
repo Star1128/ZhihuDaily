@@ -17,7 +17,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="qqqqqqqqqqqqq"
+                android:text="0条评论"
                 android:textSize="26sp"
                 android:textColor="@color/black" />
 
