@@ -86,17 +86,6 @@
             android:gravity="center" />
 
     <TextView
-            android:text="在这里左滑→"
-            android:layout_width="62dp"
-            android:layout_height="66dp"
-            android:id="@+id/textView2"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/guideline"
-            android:textSize="16sp"
-            android:gravity="center" />
-
-    <TextView
             android:text="TextView"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -116,11 +105,11 @@
             app:srcCompat="@drawable/user_image"
             android:id="@+id/opennavi"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/textView2"
             app:layout_constraintBottom_toTopOf="@id/guideline"
             android:scaleType="fitCenter"
             android:backgroundTint="@android:color/transparent"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintVertical_bias="1.0"
+            app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

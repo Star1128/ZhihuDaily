@@ -14,9 +14,11 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.zhihudaily.R;
 import com.example.zhihudaily.Bean.extra.GoodAndComments;
 import com.example.zhihudaily.Bean.latest.NewsItem;
+import com.example.zhihudaily.ui.adapter.NewsAdapter;
 import com.example.zhihudaily.utils.HttpUtil;
 import com.google.gson.Gson;
 
@@ -42,7 +44,7 @@ public class ContentActivity extends AppCompatActivity {
     }
 
     @Override
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint({"ClickableViewAccessibility", "SetJavaScriptEnabled"})
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //沉浸式状态栏设置
@@ -69,9 +71,11 @@ public class ContentActivity extends AppCompatActivity {
         //接收当前新闻对象
         Gson gson = new Gson();
         Intent intent_get = getIntent();
-        NewsItem item = gson.fromJson(intent_get.getStringExtra("Bean"), NewsItem.class);
+//        NewsItem item = gson.fromJson(intent_get.getStringExtra("Bean"), NewsItem.class);
         position = intent_get.getIntExtra("position", 0);
         boolean isImage = intent_get.getBooleanExtra("isImage", false);
+        NewsAdapter temp=(NewsAdapter)(MainActivity.recyclerView.getAdapter());
+        NewsItem item= temp.getData().get(position);
 
         //初始化点赞按钮状态
         if (item.getIsGood())
@@ -98,9 +102,10 @@ public class ContentActivity extends AppCompatActivity {
 
             //模拟数据更新，如果是轮播图的话不要执行这个
             if (!isImage) {
-                List<NewsItem> temp = MainActivity.getNewsList();
-                temp.set(position, item);
-                MainActivity.setNewsList(temp);
+                MainActivity.recyclerView.getAdapter().notifyItemChanged(position);
+//                List<NewsItem> temp = MainActivity.getNewsList();
+//                temp.set(position, item);
+//                MainActivity.setNewsList(temp);
             }
 
         });

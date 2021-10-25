@@ -1,5 +1,7 @@
 package com.example.zhihudaily.ui.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -7,6 +9,7 @@ import android.view.*;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -14,17 +17,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
-import com.example.zhihudaily.R;
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
+import com.chad.library.adapter.base.listener.OnLoadMoreListener;
 import com.example.zhihudaily.Bean.before.Before;
 import com.example.zhihudaily.Bean.latest.LatestGroup;
 import com.example.zhihudaily.Bean.latest.NewsItem;
 import com.example.zhihudaily.Bean.version.Version;
+import com.example.zhihudaily.R;
 import com.example.zhihudaily.ui.adapter.ImageAdapter;
 import com.example.zhihudaily.ui.adapter.NewsAdapter;
 import com.example.zhihudaily.utils.HttpUtil;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.youth.banner.Banner;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -35,17 +43,21 @@ import okhttp3.*;
 
 public class MainActivity extends AppCompatActivity {
 
+    static RecyclerView recyclerView;
     private static List<NewsItem> newsList = new ArrayList<>();//全部列表消息
     private final List<Before> mBeforeList = new ArrayList<>();//过往列表消息
-    private final int DAYS = 10;//当天和过去10天内的新闻
+    private final int DAYS = 3;//当天和过去3天内的新闻
     DrawerLayout mDrawerLayout;
-    static RecyclerView recyclerView;
     Banner mBanner;
     Gson gson = new Gson();
     TextView date;
     TextView month;
     TextView version;
     Version v;
+    Context mContext = this;
+    Calendar calendar;
+    SimpleDateFormat sdf;
+    int pastDay = 0;
     private LatestGroup latestGroup;//最新消息，包括列表消息和轮播消息
 
     public static List<NewsItem> getNewsList() {
@@ -89,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 checkNews();//查看DAYS天前的新闻
             }
             // TODO: 2021/8/18 目前是直接加载出十天内的，以后想实现下拉加载更多
+            //等待checkNews
             Thread.sleep(500);
             getList();
             showDate();
@@ -113,8 +126,38 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        NewsAdapter adapter = new NewsAdapter(newsList);
+        NewsAdapter adapter = new NewsAdapter(R.layout.item_newslist, newsList);
         recyclerView.setAdapter(adapter);
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
+                Intent intent = new Intent(mContext, ContentActivity.class);
+                intent.putExtra("position", position);
+                intent.putExtra("isImage", false);
+                mContext.startActivity(intent);
+            }
+        });
+        adapter.getLoadMoreModule().setEnableLoadMoreEndClick(true);
+        adapter.getLoadMoreModule().setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                for (int i = 0; i < DAYS; i++) {
+                    if(i==0)
+                        calendar.add(Calendar.DATE,-pastDay);
+                    getBefore(sdf.format(calendar.getTime()));//将操作后的Date转换为String
+                    calendar.add(Calendar.DATE, -1);
+                    pastDay+=1;
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                adapter.getLoadMoreModule().loadMoreComplete();
+                getList();
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     /**
@@ -161,13 +204,15 @@ public class MainActivity extends AppCompatActivity {
      * @throws ParseException 转格式可能会有异常
      */
     private void checkNews() throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.CHINESE);
+        sdf = new SimpleDateFormat("yyyyMMdd", Locale.CHINESE);
         Date date = sdf.parse(latestGroup.getDate());//把String变为Date
-        Calendar calendar = Calendar.getInstance();
+        calendar = Calendar.getInstance();
+        assert date != null;
         calendar.setTime(date);//给日历设置date
         for (int i = 0; i < DAYS; i++) {
             calendar.add(Calendar.DATE, -1);
             getBefore(sdf.format(calendar.getTime()));//将操作后的Date转换为String
+            pastDay += 1;
         }
     }
 

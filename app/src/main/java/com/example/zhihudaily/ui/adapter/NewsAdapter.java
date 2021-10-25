@@ -10,10 +10,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.module.LoadMoreModule;
+import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.example.zhihudaily.R;
 import com.example.zhihudaily.ui.activity.ContentActivity;
 import com.example.zhihudaily.Bean.latest.NewsItem;
 import com.google.gson.Gson;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -23,48 +28,21 @@ import java.util.List;
  * @author wxc 2021/8/16
  * @version 1.0.0
  */
-public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
+public class NewsAdapter extends BaseQuickAdapter<NewsItem,NewsAdapter.ViewHolder> implements LoadMoreModule {
 
-    private final List<NewsItem> mList;
-
-    public NewsAdapter(List<NewsItem> list) {
-        mList = list;
-    }
-
-    @NonNull
-    @Override
-    public NewsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_newslist, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+    public NewsAdapter(int layoutId,List<NewsItem> list) {
+        super(layoutId,list);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NewsAdapter.ViewHolder holder, int position) {
-        NewsItem item = mList.get(position);
+    protected void convert(@NotNull ViewHolder viewHolder, NewsItem newsItem) {
         //使用Gilde加载图片
-        Glide.with(holder.mView.getContext()).load(Uri.parse(item.getImages().replaceAll("\\\\", ""))).into(holder.newsImage);
-        holder.newsTitle.setText(item.getTitle());
-        holder.newsHint.setText(item.getHint());
-
-        holder.mView.setOnClickListener((View v)->{
-            Intent intent=new Intent(holder.mView.getContext(), ContentActivity.class);
-            Gson gson=new Gson();
-            intent.putExtra("Bean",gson.toJson(item));
-            intent.putExtra("position",position);
-            intent.putExtra("isImage",false);
-            holder.mView.getContext().startActivity(intent);
-        });
+        Glide.with(viewHolder.mView.getContext()).load(Uri.parse(newsItem.getImages().replaceAll("\\\\", ""))).into(viewHolder.newsImage);
+        viewHolder.newsTitle.setText(newsItem.getTitle());
+        viewHolder.newsHint.setText(newsItem.getHint());
     }
 
-
-
-    @Override
-    public int getItemCount() {
-        return mList.size();
-    }
-
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends BaseViewHolder {
 
         private final View mView;
         private final ImageView newsImage;
